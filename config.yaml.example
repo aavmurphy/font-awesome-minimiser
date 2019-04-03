@@ -1,0 +1,48 @@
+---
+
+# ----------------------------------------------------------------------------------
+# edit this file and rename it to 
+#    config.yaml
+# ----------------------------------------------------------------------------------
+
+SVG_JS_FILES:
+
+  # ----------------------------------------------------------------------------------
+  # The original Font Awesome SVG JS files
+  # ----------------------------------------------------------------------------------
+  #  IN is the Fontawesome 5 (free or pro) SVG Javascript (all.js or all.min.js) file.
+  #  OUT is the minimised treeshaken file
+  #
+  #  Possible values of $IN are 
+  #    /path-to/node_modules/@fortawesome/fontawesome-pro/js/all.js
+  #    /path-to/node_modules/@fortawesome/fontawesome-pro/js/all.min.js
+  #    https://use.fontawesome.com/releases/v5.8.2/js/all.js
+  # ----------------------------------------------------------------------------------
+
+  IN : ./node_modules/@fortawesome/fontawesome-pro/js/all.min.js
+  OUT: font-awesome-tree-shaker.js
+
+ICONS: 
+
+  # ----------------------------------------------------------------------------------
+  # List of icons you want to KEEP
+  # ----------------------------------------------------------------------------------
+
+  # from javascript
+  - twitter
+  - user
+
+  # from templates
+  - cloud-download-alt
+  - comment-alt-lines
+
+  # from html
+  - commenting-o
+  - comment-alt-lines
+  - home
+
+  # from maps
+  - compress
+  - rectangle-portrait
+  - rectangle-landscape
+
