@@ -16,12 +16,30 @@ SVG_JS_FILES:
   #  Possible values of $IN are 
   #    /path-to/node_modules/@fortawesome/fontawesome-pro/js/all.js
   #    /path-to/node_modules/@fortawesome/fontawesome-pro/js/all.min.js
-  #    https://use.fontawesome.com/releases/v5.8.2/js/all.js
+  #    https://use.fontawesome.com/releases/v5.14.0/js/all.js
   # ----------------------------------------------------------------------------------
 
   IN : ./node_modules/@fortawesome/fontawesome-pro/js/all.min.js
   OUT: font-awesome-tree-shaker.js
 
+FIND_DIRS :
+ - /path-to/public_html
+ - /path-to/js
+ - /path-to/templates
+
+FIND_EXTENSIONS :
+  - .js
+  - .html
+  - .shtml
+
+ICONS : 
+
+  # javascript
+
+  - fal comment-alt-lines
+  - fal trash-alt
+  - fal edit
+  - fas external-link-alt
 ICONS: 
 
   # ----------------------------------------------------------------------------------
@@ -29,20 +47,21 @@ ICONS:
   # ----------------------------------------------------------------------------------
 
   # from javascript
-  - twitter
-  - user
+  - fab twitter
+  - fab amazon
+  - fal user
 
   # from templates
-  - cloud-download-alt
-  - comment-alt-lines
+  - fal cloud-download-alt
+  - fal comment-alt-lines
 
   # from html
-  - commenting-o
-  - comment-alt-lines
-  - home
+  - fal commenting-o
+  - fal comment-alt-lines
+  - fal home
 
   # from maps
-  - compress
-  - rectangle-portrait
-  - rectangle-landscape
+  - fal compress
+  - fal rectangle-portrait
+  - fal rectangle-landscape
 
