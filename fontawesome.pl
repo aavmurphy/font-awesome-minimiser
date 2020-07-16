@@ -22,8 +22,8 @@ use warnings;
 
 our $CONFIG = "config.yaml";
 
-{
-	package FA_MINIMISER;
+package FA_MINIMISER;
+	{
 
 	use IO::All -utf8;
 	use YAML;
@@ -218,8 +218,8 @@ our $CONFIG = "config.yaml";
 
 		warn ". . $style\n";
 
-		our $matches = 0;
-		our $keep = '';
+		my $matches = 0;
+		my $keep = '';
 		my $style_icons = $self->{all_icons}{ $style } ? $self->{all_icons}{ $style } : {};
 
 		sub remove_icons
@@ -271,7 +271,7 @@ our $CONFIG = "config.yaml";
 
 		warn sprintf ( ". out : %8d K : $out_js \n" , ( -s $out_js ) / 1024 );
 		}
-}
+	}
 
 my $fa_minimiser = FA_MINIMISER->new;
 
