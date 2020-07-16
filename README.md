@@ -1,4 +1,4 @@
-# Font Awesome Minimiser (treeshaker)
+# Font Awesome V5 Minimiser (treeshaker)
 
 Font Awesome is great, but also very large. The 'free version' of the SVG JS file is now well over 1MB, and the 'PRO version' is nearly 5.7MB.
 
