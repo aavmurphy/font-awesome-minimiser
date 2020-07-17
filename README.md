@@ -51,17 +51,17 @@ Step 5 : Save to a file
 
 ## How to use
 
-1. Rename `config.yaml.example` to `config.yaml`.
+1. Rename `config.yaml.example` to `config.yaml`, and edit it.
 
-2. Edit the location of the "in" file. For the free version, use its CDN url (an example is given).
+2. Set the location of the "svg js" file. For the free version, use its CDN url (an example is given). For the 'Pro' version, it might be in `node_modules/@fontawesome`
 
-3. Edit the the location of your treeshaken "out" file.
+3. Set the the location of your treeshaken "out" file.
 
-4. Edit the list of icons ... just the icons you use.
+4. Edit the list of the icons in your project ... just the ones you use :)
 
-4.1 (Optional) Enter the directories and extensions your project uses, to do a ```find``` then ```grep``` to look for ```fa-classes```
+5. (Optional) Enter the directories and extensions your project uses. The script does a ```find``` then ```grep``` to look for ```fa-icon-name-classes```
 
-5. `perl ./fontawesome.pl`
+6. `perl ./fontawesome.pl`
 
-6. If you get a missing library error, try  (e.g. for the YAML module) ```cpan install YAML```
+7. If you get a missing library error, try  (e.g. for the YAML module) ```cpan install YAML```
 
