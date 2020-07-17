@@ -16,52 +16,67 @@
 #
 # ----------------------------------------------------------------------------------------------------------------------------------------
 
+# perl 7 ready
 use utf8;
 use strict;
 use warnings;
+use open qw(:std :utf8);
+#no feature qw(indirect);
+use feature qw(signatures);
+no warnings qw(experimental::signatures);
 
+# -----------------------------------------------------------------------------------
+
+#
 our $CONFIG = "config.yaml";
+
+#
+our %STYLES = (
+	fab	=> 'brand',
+	fal	=> 'light',
+	fas	=> 'solid',
+	fad	=> 'duotone',
+	far	=> 'regular',
+	);
+	
+our $IGNORE_REGEX = '(fa-xl|fa-lg)';
+
+# -----------------------------------------------------------------------------------
 
 package FA_MINIMISER;
 	{
-
 	use IO::All -utf8;
 	use YAML;
 	use Data::Dumper;
 
-	sub new
+	sub new( $class )
 		{ 
-		my ($class) = @_;
-
 		warn "Font Awesome Minimiser\n";
+		warn "----------------------\n";
 
 		bless {}, $class;
 	 	}
 
-	sub read_yaml
+	sub read_yaml( $self )
 		{
-		my ( $self ) = @_;
-
-		warn ". read yaml: $CONFIG\n";
+		warn "read yaml: $CONFIG\n";
 
 		$self->{config} = YAML::LoadFile( $CONFIG );
 		}
 
-	sub read_js
+	sub read_js ( $self )
 		{
-		my ( $self ) = @_;
-
 		my $in_js  = $self->{config}->{SVG_JS_FILES}->{IN};
 		
 		if ( $in_js !~ m#^https?://#i )
 			{
-			warn ". read svg js file: $in_js\n";
+			warn "read svg js - file: $in_js\n";
 			$self->{javascript} =  io( $in_js )->slurp;
 			}
 		else
 			{
 			## e.g. https://use.fontawesome.com/releases/v5.14.0/js/all.js
-			warn ". get svg js url: $in_js\n";
+			warn "get svg js - url: $in_js\n";
 			$self->{javascript} = io( $in_js )->get->content;
 			}
 
@@ -70,15 +85,13 @@ package FA_MINIMISER;
 		die "missing svg javascript" if ! $self->{javascript} or length( $self->{javascript} ) < 10000 ;
 		}
 
-	sub find
+	sub find ( $self )
 		{
-		my ( $self ) = @_;
-
-		warn ". grep the repo for fa icons\n";
+		warn "grep the repo for fa icons\n";
 
 		$self->{find_icons} = {};
 
-		warn ". . use find to get a list of files\n";
+		warn ". use find to get a list of files\n";
 
 		my $dirs	= $self->{config}->{FIND_DIRS} || [];
 		my $exts	= $self->{config}->{FIND_EXTENSIONS} || [];
@@ -113,11 +126,9 @@ package FA_MINIMISER;
 			}
 		}
 
-	sub merge_find_list
+	sub merge_find_list ( $self )
 		{
-		my ( $self ) = @_;
-
-		warn sprintf ( ". %-27s %5s %5s\n", 'icons', 'yaml', 'find' );
+		warn "merge yaml and find icon lists together\n";
 
 		## list icons
 		my @list_icons = $self->{config}{ICONS} ?  @{ $self->{config}{ICONS} } : ();
@@ -143,6 +154,8 @@ package FA_MINIMISER;
 			}
 
 		## print 'em out
+		warn sprintf ( ". %-27s %5s %5s\n", 'icons', 'yaml', 'find' );
+
 		foreach my $i ( sort keys %print_icons )
 			{
 			my $icon = $print_icons{ $i } ;
@@ -151,22 +164,34 @@ package FA_MINIMISER;
 			}
 		}
 
-	sub minimise 
+	sub minimise  ( $self )
 		{
-		my ( $self ) = @_;
+		warn "treeshake\n";
 
-		warn ". treeshake\n";
+		##
+		warn ". icons to keep\n";
 		
 		foreach my $k ( sort keys %{ $self->{all_icons}} )
 			{
-			warn ". . . $k : " . scalar( keys %{ $self->{all_icons}{ $k } } ) . "\n";
+			my @style_icons = keys %{ $self->{all_icons}{ $k } };
+
+			warn sprintf( ". . $k : %4d : %s\n", scalar( @style_icons ), join (" ", sort @style_icons) );
 			}
 
+		## is the lib normal or minimised ?
+		$self->{is_fa_js_minimised} = ( $self->{javascript} =~ /bunker/ ) ? 0 : 1;
+
+		warn ". is fa js minimised : $self->{is_fa_js_minimised}\n";
+
 		## split the lib into (preamble) brands solid regular light duotone
+		warn ". the lib is in sections : preamble, n x svg definitions, js code\n";
+
 		my @bits = split /(?=use strict)/, $self->{javascript} ;
-		warn ". split fa lib in to bits: " . scalar( @bits ) . " (want 5=free or 7=pro)\n";
+		warn ". . split fa lib in to bits: " . scalar( @bits ) . " (want 5=free or 7=pro)\n";
 
 		die "something has changed in this version (no. of bits)" if @bits != 7 and @bits != 5 ; ## free or pro version
+
+		warn ". remove unwanted definitions\n";
 
 		foreach my $i ( 0 .. $#bits )
 			{
@@ -193,45 +218,48 @@ package FA_MINIMISER;
 	## \s* for 0+ spaces
 	## "map-marker-slash" but twitter (no speechmarks)
 
-	sub minimise_bit
+	sub minimise_bit ( $self, $js )
 		{
-		my ( $self, $js ) = @_ ;
-
 		## get style for this bit of js
 		my $style = '';
 
+		# we're looking for (say) \bfab\b, but there are some style names in comments, and in an if statement before each set of svg definitions 
 		my $check_js = $js;
-		$check_js =~ s#/\*.*?\*/##sg; # remove comments
-		$check_js =~ s#["']fas["']===##sg; # remove if (prefix === 'fas') {
-		$check_js =~ s#===\s*["']fas["']##sg; # remove if (prefix === 'fas') {
+		$check_js =~ s#/\*.*?\*/##sg; 				# remove comments - normal
+		$check_js =~ s#"fas"===##sg;				# remove if (prefix === 'fas') - minimised
+		$check_js =~ s#prefix === 'fas'##sg;		# remove if (prefix === 'fas') - normal
 
-		foreach my $s ( qw( fab far fal fad fas ) )
+		foreach my $s ( sort keys %STYLES )
 			{
-			if ( $check_js =~ /["']$s["']/ )
+			if ( $check_js =~ /["']$s["']/ ) # ' = normal, " = minimised
 				{
 				die "error - $s - already set $style" if $style;
 				$style = $s;
 				}
 			}
 
-		die "something has changed in this release - style regex - $style - $js\n" if ! $style;
+		die "something has changed in this release - style regex - $style\n" if ! $style;
 
-		warn ". . $style\n";
+		warn ". . bit: $style\n";
 
-		my $matches = 0;
-		my $keep = '';
-		my $style_icons = $self->{all_icons}{ $style } ? $self->{all_icons}{ $style } : {};
+		##
+		$self->{svg_defn_matches}	= 0;
+		$self->{icons_kept}			= "";
+		$self->{icons_to_keep}		= $self->{all_icons}{ $style } ? $self->{all_icons}{ $style } : {};
 
-		sub remove_icons
+		my @keep = sort keys %{ $self->{icons_to_keep} };
+
+		warn ". . . look: @keep\n" ;
+
+		##
+		sub remove_icons ( $self, $svg_line, $icon_name, $code )
 			{
-			my ( $style_icons, $svg_line, $icon_name, $code ) = @_;
+			$self->{svg_defn_matches}++;
 
-			$matches++;
-
-			if (  $style_icons->{ $icon_name } )
+			if (  $self->{icons_to_keep}->{ $icon_name } )
 				{
 				#warn ". . . keep $icon_name\n";
-				$keep .= "$icon_name ";
+				$self->{icons_kept} .= "$icon_name ";
 				return $svg_line;
 				}
 			else
@@ -241,6 +269,7 @@ package FA_MINIMISER;
 				}
 			};
 
+		##
 		$js =~ s/
 			\s*
 			"?( [-\w]+ )"? : \s*
@@ -252,18 +281,19 @@ package FA_MINIMISER;
 				.*?
 			\]+
 			,\n*
-			/ remove_icons( $style_icons, $&, $1, $2 )
+			/ $self->remove_icons( $&, $1, $2 )
 			/xeg;
 
-		warn ". . . keep: $keep\n";
-		warn ". . . svg defs: $matches\n";
+		##
+		warn ". . . kept: $self->{icons_kept}\n";
+		warn ". . . svg defs: $self->{svg_defn_matches}\n";
 
 		return $js;
 		}
 
-	sub save_js
+	sub save_js ( $self )
 		{
-		my ( $self ) = @_;
+		warn "save\n";
 
 		my $out_js  = $self->{config}->{SVG_JS_FILES}->{OUT};
 
@@ -273,7 +303,7 @@ package FA_MINIMISER;
 		}
 	}
 
-my $fa_minimiser = FA_MINIMISER->new;
+my $fa_minimiser = FA_MINIMISER->new();
 
 $fa_minimiser->read_yaml();
 $fa_minimiser->read_js();
