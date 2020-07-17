@@ -14,10 +14,11 @@ This script minimises (treeshakes) Font Awesome 5 down to about 30K (compressed)
 
 * It works with both the free and pro versions.
 
-|Version|Number of Icons|Size|Compressed Size|
-|Free|1,598|1,182 K|428 K|
-|Pro|7,848|5,700 K|1,900 K|
-|Minimised|34|82 K|25 K|
+|Version  |Number of Icons|Size   |Compressed Size|
+|---------|--------------:|------:|--------------:|
+|Free     |1,598          |1,182 K|428 K|
+|Pro      |7,848          |5,700 K|1,900 K|
+|Minimised|34             |82 K   |25 K|
 
 ## Install
 
