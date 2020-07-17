@@ -1,18 +1,32 @@
 # Font Awesome V5 Minimiser (treeshaker)
 
+## Introduction
+
 Font Awesome is great, but also very large. The 'free version' of the SVG JS file is now well over 1MB, and the 'PRO version' is nearly 5.7MB.
 
-Why? Becasue they contain thousands of SVG icon definitions.
+Even minimised (webserver's do this behind the scenes) they are still pretty large files, especially for mobile data users.
 
-This script minimises (treeshakes) Font Awesome 5 down to about 30K (compressed) by just selected the icons you use.
+Why so large? Because it contain thousands of SVG icon definitions.
+
+This script minimises (treeshakes) Font Awesome 5 down to about 30K (compressed) by removing the vast majority of icons that you don't use, and just keeping the ones you do.
 
 * It works with both the normal and minimised versions of the Font Awesome SVG Javascript.
 
-* It also works with both the free and pro versions.
+* It works with both the free and pro versions.
 
-It is written in Perl. You may need to install some perl libraries for it to work. It quite simple, just
-```cpan install YAML```
-```cpan install IO::All```
+|Version|Number of Icons|Size|Compressed Size|
+|Free|1,598|1,182 K|428 K|
+|Pro|7,848|5,700 K|1,900 K|
+|Minimised|34|82 K|25 K|
+
+## Install
+
+It is written in Perl. You may need to install some perl libraries for it to work. Its quite simple, just
+
+```
+cpan install YAML
+cpan install IO::All
+```
 
 Or, you can copy the regular expression it uses into the language of your choice.
 
